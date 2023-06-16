@@ -1,0 +1,11 @@
+# On Linux:
+# - Ubuntu, `sudo apt-get install lld clang`
+# [target.x86_64-unknown-linux-gnu]
+# rustflags = ["-C", "linker=clang", "-C", "link-arg=-fuse-ld=lld"]
+
+# On MacOS, `brew install keith/formulae/ld64.lld `
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/bin/ld64.lld"]
+
+# [target.aarch64-apple-darwin]
+# rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/bin/ld64.lld"]
