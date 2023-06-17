@@ -12,7 +12,7 @@ async fn should_return_400_for_missing_fields() {
 
     for (invalid_body, error_message) in test_cases {
         let response = client
-        .post(&format!("{}/subscriptions", &address))
+        .post(&format!("{}/subscribe", &address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(invalid_body)
         .send()
