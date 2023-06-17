@@ -1,5 +1,35 @@
 use std::net::TcpListener;
 
+#[tokio::test]
+async fn should_return_400_for_missing_fields() {
+    let address = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("name=jon%20jones", "missing email"),
+        ("email=bones%40jones.com", "missing name"),
+        ("", "missing name and email"),
+    ];
+
+    for (invalid_body, error_message) in test_cases {
+        let response = client
+        .post(&format!("{}/subscriptions", &address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(invalid_body)
+        .send()
+        .await
+        .expect("failed to execute request");
+
+        assert_eq!(
+            400, 
+            response.status().as_u16(),
+            "should validate missing form fields. Expected 400 - {}, got {}",
+            error_message,
+            response.status().as_u16()
+        );
+    }
+
+}
+
 // cargo expand --test health_check
 #[tokio::test]
 async fn health_check_works() {
