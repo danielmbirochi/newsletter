@@ -1,0 +1,9 @@
+version: '3'
+services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+# host.docker.internal is a special DNS name which resolves to the internal IP address used by the host
