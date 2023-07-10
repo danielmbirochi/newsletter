@@ -10,14 +10,14 @@ async fn main() -> Result<(), std::io::Error> {
     let subscriber = telemetry::get_tracing_subscriber("newsletter".into(), "info".into(), std::io::stdout);
     telemetry::init_tracing_subscriber(subscriber);
 
-    let configuration = config::get_configuration().expect("Failed to read app config.");
-    let address = format!("127.0.0.1:{}", configuration.application_port);
-    let connection_pool = PgPool::connect(&configuration.database.connection_string().expose_secret())
+    let cfg = config::get_configuration().expect("Failed to read app config.");
+    let db_conn_pool = PgPool::connect(&cfg.database.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres.");
+    let app_addr = format!("{}:{}", cfg.application.host, cfg.application.port);
 
     run(
-        TcpListener::bind(address).unwrap(),
-        connection_pool,
+        TcpListener::bind(app_addr).unwrap(),
+        db_conn_pool,
     )?.await
 }
