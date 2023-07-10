@@ -1,4 +1,5 @@
 use std::net::TcpListener;
+use secrecy::ExposeSecret;
 use sqlx::{Connection, PgConnection, PgPool, Executor};
 use newsletter::config::{get_configuration, DatabaseSettings};
 use newsletter::telemetry::{get_tracing_subscriber, init_tracing_subscriber};
@@ -115,7 +116,7 @@ async fn spawn_app() -> TestApp {
 }
 
 pub async fn configure_database(cfg: &DatabaseSettings) -> PgPool {
-    let mut conn = PgConnection::connect(&cfg.connection_string_without_db())
+    let mut conn = PgConnection::connect(&cfg.connection_string_without_db().expose_secret())
         .await
         .expect("Failed to connect to Postgres.");
     conn
@@ -123,7 +124,7 @@ pub async fn configure_database(cfg: &DatabaseSettings) -> PgPool {
         .await
         .expect("Failed to create database.");
 
-    let connection_pool = PgPool::connect(&cfg.connection_string())
+    let connection_pool = PgPool::connect(&cfg.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres.");
     sqlx::migrate!("./migrations")
