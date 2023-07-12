@@ -11,7 +11,7 @@ async fn main() -> Result<(), std::io::Error> {
     telemetry::init_tracing_subscriber(subscriber);
 
     let cfg = config::get_configuration().expect("Failed to read app config.");
-    let db_conn_pool = PgPool::connect(&cfg.database.connection_string().expose_secret())
+    let db_conn_pool = PgPool::connect(cfg.database.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres.");
     let app_addr = format!("{}:{}", cfg.application.host, cfg.application.port);
