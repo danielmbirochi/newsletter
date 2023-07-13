@@ -17,7 +17,7 @@ impl SubscriberName {
             .any(|c| forbidden_characters.contains(&c));
     
         if is_empty_or_whitespace || is_too_long || contains_forbidden_characters {
-            panic!("{} invalid subscriber name", s)
+            Err(format!("{} invalid subscriber name", s))
         } else {
             Ok(Self(s))
         }
