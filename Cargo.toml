@@ -26,6 +26,7 @@ tracing-bunyan-formatter = "0.3"
 tracing-actix-web = "0.7"
 secrecy = { version = "0.8", features = ["serde"] }
 unicode-segmentation = "1.8.0"
+validator = "0.16.0"
 
 
 [dependencies.sqlx]
