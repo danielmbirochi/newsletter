@@ -23,9 +23,17 @@ pub async fn subscribe(
     form: web::Form<SubscriptionFormData>,
     conn: web::Data<PgPool>,
 ) -> HttpResponse {
+    let subscriber_name = SubscriberName::parse(form.0.name).expect("Invalid subscriber name");
+
+    // let subscriber_name = match SubscriberName::parse(form.0.name) {
+    //     Ok(name) => name,
+    //     Err(e) => HttpResponse::BadRequest().body(e),
+    // };
+    // }
+
     let new_subscriber = NewSubscriber {
         email: form.0.email.to_string(),
-        name: SubscriberName::parse(form.0.name),
+        name: subscriber_name,
     };
     match insert_subscriber(&conn, &new_subscriber).await {
         Ok(_) => {

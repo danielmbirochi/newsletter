@@ -1,15 +1,10 @@
 use unicode_segmentation::UnicodeSegmentation;
 
-
-pub struct NewSubscriber {
-    pub email: String,
-    pub name: SubscriberName,
-}
-
+#[derive(Debug)]
 pub struct SubscriberName(String);
 
 impl SubscriberName {
-    pub fn parse(s: String) -> SubscriberName {
+    pub fn parse(s: String) -> Result<SubscriberName, String> {
         let is_empty_or_whitespace = s.trim().is_empty();
 
         // A grapheme is defined by the Unicode standard as a "user-perceived" character:
@@ -24,7 +19,7 @@ impl SubscriberName {
         if is_empty_or_whitespace || is_too_long || contains_forbidden_characters {
             panic!("{} invalid subscriber name", s)
         } else {
-            Self(s)
+            Ok(Self(s))
         }
     }
 }
