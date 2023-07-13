@@ -29,3 +29,49 @@ impl AsRef<str> for SubscriberName {
         &self.0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::domain::SubscriberName;
+    use claims::{assert_err, assert_ok};
+
+    #[test]
+    fn empty_string_is_rejected() {
+        let empty = "".to_string();
+        assert_err!(SubscriberName::parse(empty));
+    }
+
+    #[test]
+    fn whitespace_only_string_is_rejected() {
+        let whitespace = " ".to_string();
+        assert_err!(SubscriberName::parse(whitespace));
+    }
+
+    #[test]
+    fn string_with_more_than_256_graphemes_is_rejected() {
+        let long_string = "a".repeat(257);
+        assert_err!(SubscriberName::parse(long_string));
+    }
+
+    #[test]
+    fn string_with_forbidden_characters_is_rejected() {
+        let forbidden_characters = ['/', '\\', ':', '*', '?', '"', '<', '>', '|', '{', '}', '(', ')', '[', ']', '&', '$', '#', '@', '%', '^', '!', '~', '`', '+', '=', ';', ','];
+        for c in forbidden_characters.iter()  {
+            let string_with_forbidden_character = format!("a{}", c);
+            assert_err!(SubscriberName::parse(string_with_forbidden_character));
+        }
+    }
+
+    #[test]
+    fn valid_subscriber_name_is_parsed_successfully() {
+        let valid_subscriber_name = "valid_subscriber_name".to_string();
+        assert_ok!(SubscriberName::parse(valid_subscriber_name));
+    }
+
+    #[test]
+    fn valid_subscriber_name_with_256_graphemes_is_parsed_successfully() {
+        let valid_subscriber_name = "a".repeat(256);
+        assert_ok!(SubscriberName::parse(valid_subscriber_name));
+    }
+
+}
