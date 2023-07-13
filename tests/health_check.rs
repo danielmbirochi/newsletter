@@ -25,6 +25,36 @@ pub struct TestApp {
 }
 
 #[tokio::test]
+async fn subscribe_returns_400_when_fields_are_present_but_invalid() {
+    let test_app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let test_cases = vec![
+        ("name=jon%20jones&email=", "missing email"),
+        ("name=&email=bones%40jones.com", "missing name"),
+        ("name=chuck&email=chuck", "invalid email"),
+        ("name=&email=", "missing name and email"),
+    ];
+
+    for (invalid_body, error_message) in test_cases {
+        let response = client
+            .post(&format!("{}/subscribe", &test_app.server_addr))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(invalid_body)
+            .send()
+            .await
+            .expect("failed to execute request");
+
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API did not fail with 400 Bad Request when the payload was {}.",
+            error_message
+        );
+    }
+}
+
+#[tokio::test]
 async fn subscribe_returns_a_200_for_valie_form_data() {
     let test_app = spawn_app().await;
     let client = reqwest::Client::new();
