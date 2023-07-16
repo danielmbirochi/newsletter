@@ -23,6 +23,18 @@ impl AsRef<str> for SubscriberEmail {
 mod tests {
     use crate::domain::SubscriberEmail;
     use claims::{assert_err, assert_ok};
+    use fake::faker::internet::en::SafeEmail;
+    use fake::Fake;
+
+    #[derive(Debug,Clone)]
+    struct ValidEmailFixture(String);
+
+    impl quickcheck::Arbitrary for ValidEmailFixture {
+        fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
+            let email = SafeEmail().fake_with_rng(g);
+            Self(email)
+        }
+    }
 
     #[test]
     fn empty_string_is_rejected() {
@@ -47,4 +59,11 @@ mod tests {
         let email_with_subject_and_symbol = "some@email.com".to_string();
         assert_ok!(SubscriberEmail::parse(email_with_subject_and_symbol));
     }
+
+    #[quickcheck_macros::quickcheck]
+    fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
+        dbg!(&valid_email.0);
+        SubscriberEmail::parse(valid_email.0).is_ok()
+    }
+
 }
